@@ -29,6 +29,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:backgroundTint="#0078FF"
+        android:onClick="onClickCamera"
         app:srcCompat="@drawable/ic_menu_camera" />
 
 </android.support.design.widget.CoordinatorLayout>
