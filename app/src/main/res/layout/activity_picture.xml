@@ -30,6 +30,7 @@
         android:layout_margin="16dp"
         android:onClick="onClickCaptureImage"
         app:backgroundTint="#0078FF"
+        app:borderWidth="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
