@@ -1,7 +1,10 @@
 package com.project.harrisonturley.whiteboardide;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
@@ -15,6 +18,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,8 +43,9 @@ public class PictureActivity extends AppCompatActivity {
     private HandlerThread backgroundThread;
     private Handler backgroundHandler;
     private TextureView.SurfaceTextureListener surfaceTextureListener;
-    private TextureView textureView;
     private CameraDevice.StateCallback stateCallback;
+    private TextureView textureView;
+    private FloatingActionButton floatingActionButton;
 
     private CaptureRequest.Builder captureRequestBuilder;
     private CaptureRequest captureRequest;
@@ -49,11 +54,15 @@ public class PictureActivity extends AppCompatActivity {
     private int cameraFacing;
     private Size previewSize;
     private String cameraId;
+    private String imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
+
+        floatingActionButton = (FloatingActionButton)findViewById(R.id.capture_button);
+        disableFab();
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
 
@@ -141,6 +150,10 @@ public class PictureActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            Intent intent = new Intent(this, SavePictureActivity.class);
+            intent.putExtra(getString(R.string.saved_image_path), imagePath);
+            startActivity(intent);
         }
     }
 
@@ -172,8 +185,7 @@ public class PictureActivity extends AppCompatActivity {
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             captureRequestBuilder.addTarget(previewSurface);
 
-            cameraDevice.createCaptureSession(Collections.singletonList(previewSurface),
-                    new CameraCaptureSession.StateCallback() {
+            cameraDevice.createCaptureSession(Collections.singletonList(previewSurface), new CameraCaptureSession.StateCallback() {
 
                         @Override
                         public void onConfigured(CameraCaptureSession cameraCaptureSession) {
@@ -185,6 +197,7 @@ public class PictureActivity extends AppCompatActivity {
                                 captureRequest = captureRequestBuilder.build();
                                 PictureActivity.this.cameraCaptureSession = cameraCaptureSession;
                                 PictureActivity.this.cameraCaptureSession.setRepeatingRequest(captureRequest, null, backgroundHandler);
+                                PictureActivity.this.enableFab();
                             } catch (CameraAccessException e) {
                                 e.printStackTrace();
                             }
@@ -250,6 +263,24 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    private void enableFab() {
+        if (floatingActionButton == null) {
+            return;
+        }
+
+        floatingActionButton.setEnabled(true);
+        floatingActionButton.setAlpha(1.0f);
+    }
+
+    private void disableFab() {
+        if (floatingActionButton == null) {
+            return;
+        }
+
+        floatingActionButton.setAlpha(0f);
+        floatingActionButton.setEnabled(false);
+    }
+
     private File createImageFile() throws IOException {
         File galleryFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getResources().getString(R.string.app_name));
         if (!galleryFolder.exists()) {
@@ -261,6 +292,7 @@ public class PictureActivity extends AppCompatActivity {
         }
 
         File imageFile = new File(galleryFolder.getPath(), imageFileName);
+        imagePath = imageFile.getPath();
 
         if (imageFile.exists()) {
             imageFile.delete();
