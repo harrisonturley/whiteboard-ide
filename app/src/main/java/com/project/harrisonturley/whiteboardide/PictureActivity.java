@@ -3,6 +3,7 @@ package com.project.harrisonturley.whiteboardide;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -11,20 +12,27 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.View;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 
 public class PictureActivity extends AppCompatActivity {
 
-    private final static int CAMERA_REQUEST_CODE = 200;
+    private static final int CAMERA_REQUEST_CODE = 200;
+    private static final String imageFileName = "/CapturedImage.jpg";
 
     private CameraManager cameraManager;
     private CameraDevice cameraDevice;
@@ -47,7 +55,7 @@ public class PictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
 
         cameraManager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         cameraFacing = CameraCharacteristics.LENS_FACING_BACK;
@@ -114,6 +122,26 @@ public class PictureActivity extends AppCompatActivity {
         super.onStop();
         closeCamera();
         closeBackgroundThread();
+    }
+
+    public void onClickCaptureImage(View v) {
+        lock();
+        FileOutputStream outputPhoto = null;
+        try {
+            outputPhoto = new FileOutputStream(createImageFile());
+            textureView.getBitmap().compress(Bitmap.CompressFormat.PNG, 100, outputPhoto);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            unlock();
+            try {
+                if (outputPhoto != null) {
+                    outputPhoto.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void closeCamera() {
@@ -202,5 +230,42 @@ public class PictureActivity extends AppCompatActivity {
         backgroundThread = new HandlerThread("camera_background_thread");
         backgroundThread.start();
         backgroundHandler = new Handler(backgroundThread.getLooper());
+    }
+
+    private void lock() {
+        try {
+            cameraCaptureSession.capture(captureRequestBuilder.build(),
+                    null, backgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void unlock() {
+        try {
+            cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(),
+                    null, backgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        File galleryFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getResources().getString(R.string.app_name));
+        if (!galleryFolder.exists()) {
+            boolean makeGalleryFolder = galleryFolder.mkdirs();
+
+            if (!makeGalleryFolder) {
+                Log.e("CaptureFiles", "Failed to create a new directory");
+            }
+        }
+
+        File imageFile = new File(galleryFolder.getPath(), imageFileName);
+
+        if (imageFile.exists()) {
+            imageFile.delete();
+        }
+
+        return imageFile;
     }
 }
