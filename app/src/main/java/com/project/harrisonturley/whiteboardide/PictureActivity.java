@@ -64,7 +64,7 @@ public class PictureActivity extends AppCompatActivity {
         floatingActionButton = (FloatingActionButton)findViewById(R.id.capture_button);
         disableFab();
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET}, CAMERA_REQUEST_CODE);
 
         cameraManager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         cameraFacing = CameraCharacteristics.LENS_FACING_BACK;
