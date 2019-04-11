@@ -16,6 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +38,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, HttpRequestClient.HttpResponseListener {
 
     private HttpRequestClient mHttpRequestClient;
 
@@ -57,10 +60,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key));
+        mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), this);
         Bundle extras = getIntent().getExtras();
+
         if (extras != null) {
             setupCodeView(extras.getString(getString(R.string.saved_image_path)));
+        } else {
+
         }
     }
 
@@ -121,6 +127,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    /* HttpRequestClient callbacks */
+
+    public void onImageProcessingResponse(JSONObject response) {
+        try {
+            if (!response.getString("status").equals("Succeeded"))
+                return;
+
+            JSONArray results = response.getJSONObject("recognitionResult").getJSONArray("lines");
+            String[] resultStrings = new String[results.length()];
+
+            for (int i = 0; i < results.length(); i++) {
+                JSONObject tempResult = results.getJSONObject(i);
+                resultStrings[i] = tempResult.getString("text");
+            }
+
+            Log.e("FinalizedText", Arrays.toString(resultStrings));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void onClickCamera(View v) {
         Intent intent = new Intent(this, PictureActivity.class);
         startActivity(intent);
@@ -151,81 +178,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             e.printStackTrace();
         }
     }
-
-    /*private void setupCodeView(String imageFilePath) {
-        CloseableHttpClient httpTextClient = HttpClientBuilder.create().build();
-
-        try {
-            URIBuilder builder = new URIBuilder(uriBase);
-            builder.setParameter("mode", "Handwritten");
-
-            URI uri = builder.build();
-            HttpPost request = new HttpPost(uri);
-
-            request.setHeader("Content-Type", "application/octet-stream");
-            request.setHeader("Ocp-Apim-Subscription-Key", imageProcessingKey);
-
-            File file = new File(imageFilePath);
-            FileEntity reqEntity = new FileEntity(file);
-            request.setEntity(reqEntity);
-
-            HttpResponse response = httpTextClient.execute(request);
-
-            if (response.getStatusLine().getStatusCode() != 202) {
-                HttpEntity entity = response.getEntity();
-                String jsonString = EntityUtils.toString(entity);
-                JSONObject json = new JSONObject(jsonString);
-                Log.e("JSON Error", json.toString(2));
-                return;
-            }
-
-            operationLocation = null;
-
-            Header[] responseHeaders = response.getAllHeaders();
-            for (Header header : responseHeaders) {
-                if (header.getName().equals("Operation-Location")) {
-                    operationLocation = header.getValue();
-                    break;
-                }
-            }
-
-            if (operationLocation == null) {
-                Log.e("Location Error", "Error retrieving Operation-Location");
-                return;
-            }
-
-            new CountDownTimer(10000, 1000) {
-                public void onTick(long millisUntilFinished) {
-
-                }
-
-                public void onFinish() {
-                    completeReadRequest(MainActivity.this.operationLocation);
-                }
-            }.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void completeReadRequest(String operationLocation) {
-        CloseableHttpClient httpResultClient = HttpClientBuilder.create().build();
-        HttpGet resultRequest = new HttpGet(operationLocation);
-        resultRequest.setHeader("Ocp-Apim-Subscription-Key", imageProcessingKey);
-
-        try {
-            HttpResponse resultResponse = httpResultClient.execute(resultRequest);
-            HttpEntity responseEntity = resultResponse.getEntity();
-
-            if (responseEntity != null) {
-                String jsonString = EntityUtils.toString(responseEntity);
-                JSONObject json = new JSONObject(jsonString);
-                Log.e("Final Result", json.toString(2));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
-
-
 }

@@ -26,15 +26,21 @@ import okhttp3.ResponseBody;
 
 public class HttpRequestClient {
 
-    private OkHttpClient mClient = new OkHttpClient();
+    interface HttpResponseListener {
+        void onImageProcessingResponse(JSONObject response);
+    }
 
     private static final String HEADER_KEY = "Ocp-Apim-Subscription-Key";
     private static final String DATA_TYPE_KEY = "Content-Type";
     private static final String DATA_TYPE_VALUE = "application/octet-stream";
+
+    private OkHttpClient mClient = new OkHttpClient();
+    private HttpResponseListener httpResponseListener;
     private String imageProcessingKey;
 
-    public HttpRequestClient(String imageProcessingKey) {
+    public HttpRequestClient(String imageProcessingKey, HttpResponseListener httpResponseListener) {
         this.imageProcessingKey = imageProcessingKey;
+        this.httpResponseListener = httpResponseListener;
     }
 
     public Object postWriting(String url, Map<String, Object> data) {
@@ -42,18 +48,12 @@ public class HttpRequestClient {
         MediaType mediaType = MediaType.parse("application/octet-stream");
         RequestBody requestBody = RequestBody.create(mediaType,(byte[]) data.get("data"));
 
-        //URIBuilder builder = new URIBuilder(uriBase);
-        //builder.setParameter("mode", "Handwritten");
-
-        //URI uri = builder.build();
-
         Request request = new Request.Builder()
                 .addHeader(HEADER_KEY, imageProcessingKey)
                 .addHeader(DATA_TYPE_KEY, DATA_TYPE_VALUE)
                 .url(url)
                 .post(requestBody)
                 .build();
-        //Request request = new Request.Builder().url("http://httpbin.org/ip").build();
 
         try {
             Call call = mClient.newCall(request);
@@ -70,8 +70,7 @@ public class HttpRequestClient {
                     getResult(response);
                 }
             });
-            //Response response = mClient.newCall(request).execute();
-            //return readInput(response.body().byteStream());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,11 +113,11 @@ public class HttpRequestClient {
                     .addHeader(HEADER_KEY, imageProcessingKey)
                     .url(url)
                     .build();
-            
+
             Response requestResponse = mClient.newCall(request).execute();
             String jsonString = requestResponse.body().string();
             JSONObject json = new JSONObject(jsonString);
-            Log.e("Test", json.toString(2));
+            httpResponseListener.onImageProcessingResponse(json);
         } catch (Exception e) {
             e.printStackTrace();
         }
