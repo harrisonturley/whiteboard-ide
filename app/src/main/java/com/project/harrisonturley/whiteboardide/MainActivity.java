@@ -32,6 +32,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.kbiakov.codeview.CodeView;
+import io.github.kbiakov.codeview.adapters.Options;
+import io.github.kbiakov.codeview.highlight.ColorTheme;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -41,6 +44,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, HttpRequestClient.HttpResponseListener {
 
     private HttpRequestClient mHttpRequestClient;
+    private CodeView codeView;
 
     private static final String uriBase = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
 
@@ -48,23 +52,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), this);
+        codeView = (CodeView) findViewById(R.id.code_view);
+
+        setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         navigationView.setNavigationItemSelectedListener(this);
 
-        mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), this);
+
         Bundle extras = getIntent().getExtras();
 
         if (extras != null) {
-            setupCodeView(extras.getString(getString(R.string.saved_image_path)));
+            sendImage(extras.getString(getString(R.string.saved_image_path)));
         } else {
 
         }
@@ -135,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return;
 
             JSONArray results = response.getJSONObject("recognitionResult").getJSONArray("lines");
-            String[] resultStrings = new String[results.length()];
+            final String[] resultStrings = new String[results.length()];
 
             for (int i = 0; i < results.length(); i++) {
                 JSONObject tempResult = results.getJSONObject(i);
@@ -143,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             Log.e("FinalizedText", Arrays.toString(resultStrings));
+            onNewCodeData(resultStrings);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -153,12 +162,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
-    private void setupCodeView(String imageFilePath) {
+    private void onNewCodeData(final String[] lines) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                codeView.setCode(Arrays.toString(lines));
+            }
+        });
+    }
+
+    private void sendImage(String imageFilePath) {
         Map<String, Object> params = new HashMap<>();
         File imgFile = new File(imageFilePath);
 
         params.put("mode", "Handwritten");
         String url = HttpRequestClient.getUrl(uriBase, params);
+
+        codeView.setOptions(Options.Default.get(this)
+            .withTheme(ColorTheme.MONOKAI));
 
         try {
             InputStream imgStream = new FileInputStream(imgFile);
