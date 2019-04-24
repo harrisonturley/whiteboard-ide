@@ -53,21 +53,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), this);
         codeView = (CodeView) findViewById(R.id.code_view);
-
-        setSupportActionBar(toolbar);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-
-        navigationView.setNavigationItemSelectedListener(this);
-
 
         Bundle extras = getIntent().getExtras();
 
@@ -90,16 +77,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -151,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             Log.e("FinalizedText", Arrays.toString(resultStrings));
-            onNewCodeData(resultStrings);
+            onNewCodeReceived(resultStrings);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -162,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
-    private void onNewCodeData(final String[] lines) {
+    private void onNewCodeReceived(final String[] lines) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
