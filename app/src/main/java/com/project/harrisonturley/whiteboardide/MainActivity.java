@@ -41,7 +41,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, HttpRequestClient.HttpResponseListener {
+public class MainActivity extends AppCompatActivity implements HttpRequestClient.HttpResponseListener {
 
     private HttpRequestClient mHttpRequestClient;
     private CodeView codeView;
@@ -61,62 +61,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (extras != null) {
             sendImage(extras.getString(getString(R.string.saved_image_path)));
         } else {
-
+            onNewCodeReceived("package io.github.kbiakov.codeviewexample;\n" +
+                    "\n" +
+                    "import android.os.Bundle;\n" +
+                    "import android.support.annotation.Nullable;\n" +
+                    "import android.support.v7.app.AppCompatActivity;\n" +
+                    "import android.util.Log;\n" +
+                    "\n" +
+                    "import org.jetbrains.annotations.NotNull;\n" +
+                    "\n" +
+                    "import io.github.kbiakov.codeview.CodeView;\n" +
+                    "import io.github.kbiakov.codeview.OnCodeLineClickListener;\n" +
+                    "import io.github.kbiakov.codeview.adapters.CodeWithDiffsAdapter;\n" +
+                    "import io.github.kbiakov.codeview.adapters.Options;\n" +
+                    "import io.github.kbiakov.codeview.highlight.ColorTheme;\n" +
+                    "import io.github.kbiakov.codeview.highlight.ColorThemeData;\n" +
+                    "import io.github.kbiakov.codeview.highlight.Font;\n" +
+                    "import io.github.kbiakov.codeview.highlight.FontCache;\n" +
+                    "import io.github.kbiakov.codeview.views.DiffModel;\n" +
+                    "\n" +
+                    "public class ListingsActivity extends AppCompatActivity {\n" +
+                    "\n" +
+                    "    @Override\n" +
+                    "    protected void onCreate(@Nullable Bundle savedInstanceState) {\n" +
+                    "        super.onCreate(savedInstanceState);\n" +
+                    "        setContentView(R.layout.activity_listings);\n" +
+                    "\n" +
+                    "        final CodeView codeView = (CodeView) findViewById(R.id.code_view);\n" +
+                    "\n" +
+                    "        /*\n" +
+                    "         * 1: set code content\n" +
+                    "         */\n" +
+                    "\n" +
+                    "        // auto language recognition\n" +
+                    "        codeView.setCode(getString(R.string.listing_js));\n" +
+                    "\n" +
+                    "        // specify language for code listing\n" +
+                    "        codeView.setCode(getString(R.string.listing_py), \"py\");\n" +
+                    "    }\n" +
+                    "}");
         }
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
+    public void onBackPressed() { }
 
     /* HttpRequestClient callbacks */
 
@@ -134,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             Log.e("FinalizedText", Arrays.toString(resultStrings));
-            onNewCodeReceived(resultStrings);
+            //onNewCodeReceived(resultStrings);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -145,11 +133,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
-    private void onNewCodeReceived(final String[] lines) {
+    private void onNewCodeReceived(final String lines) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                codeView.setCode(Arrays.toString(lines));
+                codeView.setCode(lines);
             }
         });
     }
