@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,10 +44,12 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements HttpRequestClient.HttpResponseListener {
 
+    private static final String uriBase = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
+
     private HttpRequestClient mHttpRequestClient;
     private CodeView codeView;
 
-    private static final String uriBase = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
+    private ArrayList<String> codeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +58,14 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
         mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), this);
         codeView = (CodeView) findViewById(R.id.code_view);
+        codeText = new ArrayList<String>();
 
         Bundle extras = getIntent().getExtras();
 
         if (extras != null) {
             sendImage(extras.getString(getString(R.string.saved_image_path)));
         } else {
+//            codeText = new ArrayList<String>();
             onNewCodeReceived("package io.github.kbiakov.codeviewexample;\n" +
                     "\n" +
                     "import android.os.Bundle;\n" +
@@ -115,10 +120,12 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
             JSONArray results = response.getJSONObject("recognitionResult").getJSONArray("lines");
             final String[] resultStrings = new String[results.length()];
+            codeText.clear();
 
             for (int i = 0; i < results.length(); i++) {
                 JSONObject tempResult = results.getJSONObject(i);
                 resultStrings[i] = tempResult.getString("text");
+                codeText.add(tempResult.getString("text"));
             }
 
             Log.e("FinalizedText", Arrays.toString(resultStrings));
