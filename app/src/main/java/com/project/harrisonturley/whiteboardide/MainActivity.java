@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.github.kbiakov.codeview.CodeView;
+import io.github.kbiakov.codeview.OnCodeLineClickListener;
 import io.github.kbiakov.codeview.adapters.Options;
 import io.github.kbiakov.codeview.highlight.ColorTheme;
 import okhttp3.MediaType;
@@ -106,6 +108,13 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
                     "    }\n" +
                     "}");
         }
+
+        codeView.getOptions().addCodeLineClickListener(new OnCodeLineClickListener() {
+            @Override
+            public void onCodeLineClicked(int i, @NotNull String s) {
+                openLineEditDialog(i);
+            }
+        });
     }
 
     @Override
@@ -176,5 +185,10 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void openLineEditDialog(int line) {
+        CodeLineEditFragment lineFragment = new CodeLineEditFragment();
+        lineFragment.show(getFragmentManager(), "LineEdit");
     }
 }
