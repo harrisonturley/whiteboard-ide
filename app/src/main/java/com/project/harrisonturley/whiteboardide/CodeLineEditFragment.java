@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.Window;
 
 /**
- * Dialog fragment to allow editing of individual lines of code
+ * Dialog fragment to allow editing of individual lines of code, with callback for results to code view
  */
 public class CodeLineEditFragment extends DialogFragment {
 
