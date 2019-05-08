@@ -3,6 +3,7 @@ package com.project.harrisonturley.whiteboardide;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +21,8 @@ public class CodeLineEditFragment extends DialogFragment {
     public interface CodeLineEditListener {
         void onLineSaved(int line, String newText);
     }
+
+    private CodeLineEditListener listener;
 
     /**
      * Creates the dialog fragment based on the layout
@@ -41,6 +44,7 @@ public class CodeLineEditFragment extends DialogFragment {
                     }
                 }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        listener.onLineSaved(1, "test");
                         CodeLineEditFragment.this.getDialog().cancel();
                     }
         });
@@ -59,5 +63,19 @@ public class CodeLineEditFragment extends DialogFragment {
         Window window = dialog.getWindow();
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.brightBlue, getActivity().getTheme()));
         window.setBackgroundDrawableResource(R.drawable.background_rounded);
+    }
+
+    /**
+     * Ensures that the context that created the line editing dialog implements the CodeLineEditListener
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            listener = (CodeLineEditListener)context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Must implement CodeLineEditListener");
+        }
     }
 }

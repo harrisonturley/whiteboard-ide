@@ -44,7 +44,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements HttpRequestClient.HttpResponseListener {
+public class MainActivity extends AppCompatActivity implements HttpRequestClient.HttpResponseListener, CodeLineEditFragment.CodeLineEditListener {
 
     private static final String uriBase = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
 
@@ -120,7 +120,9 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     @Override
     public void onBackPressed() { }
 
-    /* HttpRequestClient callbacks */
+    //
+    // HttpRequestClient callbacks
+    //
 
     public void onImageProcessingResponse(JSONObject response) {
         try {
@@ -142,6 +144,14 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    //
+    // CodeLineEditFragment listener callbacks
+    //
+
+    public void onLineSaved(int line, String newText) {
+
     }
 
     public void onClickCamera(View v) {
