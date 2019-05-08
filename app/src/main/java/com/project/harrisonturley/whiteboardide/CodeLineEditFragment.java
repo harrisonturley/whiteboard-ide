@@ -13,6 +13,14 @@ import android.view.Window;
  * Dialog fragment to allow editing of individual lines of code
  */
 public class CodeLineEditFragment extends DialogFragment {
+
+    /**
+     * Callback from saving the code to update code view
+     */
+    public interface CodeLineEditListener {
+        void onLineSaved(int line, String newText);
+    }
+
     /**
      * Creates the dialog fragment based on the layout
      * @param savedInstanceState saved state variables
@@ -27,11 +35,16 @@ public class CodeLineEditFragment extends DialogFragment {
         View v = inflater.inflate(R.layout.fragment_code_line_edit, null);
 
         builder.setView(v)
-                .setNegativeButton("Done", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         CodeLineEditFragment.this.getDialog().cancel();
                     }
-                });
+                }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        CodeLineEditFragment.this.getDialog().cancel();
+                    }
+        });
+
         return builder.create();
     }
 
