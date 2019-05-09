@@ -43,15 +43,21 @@
 
     <!-- Below header -->
 
-    <TextView
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/code_entry_field"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Code"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="15dp"
+        android:color="#FFFFFF"
+        android:backgroundTint="#FFFFFF"
         android:textColor="#FFFFFF"
-        android:textAlignment="center"
-        android:text="Test"
         app:layout_constraintTop_toBottomOf="@id/about_border"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>
