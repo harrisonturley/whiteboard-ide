@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     }
 
     private void openLineEditDialog(int line) {
-        CodeLineEditFragment lineFragment = new CodeLineEditFragment();
+        CodeLineEditFragment lineFragment = CodeLineEditFragment.newInstance(1, "testing");
         lineFragment.show(getFragmentManager(), "LineEdit");
     }
 }
