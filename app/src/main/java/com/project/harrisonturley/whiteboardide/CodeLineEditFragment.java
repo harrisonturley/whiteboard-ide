@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 
 /**
  * Dialog fragment to allow editing of individual lines of code, with callback for results to code view
@@ -22,7 +23,22 @@ public class CodeLineEditFragment extends DialogFragment {
         void onLineSaved(int line, String newText);
     }
 
+    private static final String LINE_ARG = "LineNum";
+    private static final String CODE_ARG = "CurrentText";
+
+    private EditText codeEntryField;
     private CodeLineEditListener listener;
+
+    public static CodeLineEditFragment newInstance(int line, String currentText) {
+        CodeLineEditFragment newLineDialog = new CodeLineEditFragment();
+
+        Bundle args = new Bundle();
+        args.putInt(LINE_ARG, line);
+        args.putString(CODE_ARG, currentText);
+        newLineDialog.setArguments(args);
+
+        return newLineDialog;
+    }
 
     /**
      * Creates the dialog fragment based on the layout
@@ -33,9 +49,14 @@ public class CodeLineEditFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
+        int lineNum = getArguments().getInt(LINE_ARG);
+        String currentCode = getArguments().getString(CODE_ARG);
+
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.fragment_code_line_edit, null);
+
+        codeEntryField = v.findViewById(R.id.code_entry_field);
 
         builder.setView(v)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -44,7 +65,7 @@ public class CodeLineEditFragment extends DialogFragment {
                     }
                 }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        listener.onLineSaved(1, "test");
+                        listener.onLineSaved(1, codeEntryField.getText().toString());
                         CodeLineEditFragment.this.getDialog().cancel();
                     }
         });
