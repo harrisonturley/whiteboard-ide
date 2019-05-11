@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.TextView;
 
 /**
  * Dialog fragment to allow editing of individual lines of code, with callback for results to code view
@@ -27,6 +28,8 @@ public class CodeLineEditFragment extends DialogFragment {
     private static final String CODE_ARG = "CurrentText";
 
     private EditText codeEntryField;
+    private TextView titleText;
+
     private CodeLineEditListener listener;
 
     public static CodeLineEditFragment newInstance(int line, String currentText) {
@@ -57,6 +60,10 @@ public class CodeLineEditFragment extends DialogFragment {
         View v = inflater.inflate(R.layout.fragment_code_line_edit, null);
 
         codeEntryField = v.findViewById(R.id.code_entry_field);
+        titleText = v.findViewById(R.id.code_entry_title);
+
+        codeEntryField.setText(currentCode);
+        titleText.setText("Line " + lineNum);
 
         builder.setView(v)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
