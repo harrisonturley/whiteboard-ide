@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         codeView.getOptions().addCodeLineClickListener(new OnCodeLineClickListener() {
             @Override
             public void onCodeLineClicked(int i, @NotNull String s) {
-                openLineEditDialog(i);
+                openLineEditDialog(i, s);
             }
         });
     }
@@ -120,9 +120,9 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     @Override
     public void onBackPressed() { }
 
-    //
-    // HttpRequestClient callbacks
-    //
+    /*
+     * HttpRequestClient callbacks
+     */
 
     public void onImageProcessingResponse(JSONObject response) {
         try {
@@ -146,12 +146,13 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
     }
 
-    //
-    // CodeLineEditFragment listener callbacks
-    //
+    /*
+     * CodeLineEditFragment listener callbacks
+     */
 
     public void onLineSaved(int line, String newText) {
-
+        codeText.set(line, newText);
+        // Call method to translate array to code
     }
 
     public void onClickCamera(View v) {
@@ -197,8 +198,19 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
     }
 
-    private void openLineEditDialog(int line) {
-        CodeLineEditFragment lineFragment = CodeLineEditFragment.newInstance(1, "testing");
+    private void openLineEditDialog(int line, String text) {
+        CodeLineEditFragment lineFragment = CodeLineEditFragment.newInstance(line, text);
         lineFragment.show(getFragmentManager(), "LineEdit");
+    }
+
+    private String getCodeStringFromLines() {
+        String code = "";
+
+        for (int i = 0; i < codeText.size(); i++) {
+            code += codeText.get(i);
+            code += "\n";
+        }
+
+        return code;
     }
 }
