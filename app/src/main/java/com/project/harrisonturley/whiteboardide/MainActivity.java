@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -67,46 +68,16 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         if (extras != null) {
             sendImage(extras.getString(getString(R.string.saved_image_path)));
         } else {
-//            codeText = new ArrayList<String>();
-            onNewCodeReceived("package io.github.kbiakov.codeviewexample;\n" +
-                    "\n" +
-                    "import android.os.Bundle;\n" +
-                    "import android.support.annotation.Nullable;\n" +
-                    "import android.support.v7.app.AppCompatActivity;\n" +
-                    "import android.util.Log;\n" +
-                    "\n" +
-                    "import org.jetbrains.annotations.NotNull;\n" +
-                    "\n" +
-                    "import io.github.kbiakov.codeview.CodeView;\n" +
-                    "import io.github.kbiakov.codeview.OnCodeLineClickListener;\n" +
-                    "import io.github.kbiakov.codeview.adapters.CodeWithDiffsAdapter;\n" +
-                    "import io.github.kbiakov.codeview.adapters.Options;\n" +
-                    "import io.github.kbiakov.codeview.highlight.ColorTheme;\n" +
-                    "import io.github.kbiakov.codeview.highlight.ColorThemeData;\n" +
-                    "import io.github.kbiakov.codeview.highlight.Font;\n" +
-                    "import io.github.kbiakov.codeview.highlight.FontCache;\n" +
-                    "import io.github.kbiakov.codeview.views.DiffModel;\n" +
-                    "\n" +
-                    "public class ListingsActivity extends AppCompatActivity {\n" +
-                    "\n" +
-                    "    @Override\n" +
-                    "    protected void onCreate(@Nullable Bundle savedInstanceState) {\n" +
-                    "        super.onCreate(savedInstanceState);\n" +
-                    "        setContentView(R.layout.activity_listings);\n" +
-                    "\n" +
-                    "        final CodeView codeView = (CodeView) findViewById(R.id.code_view);\n" +
-                    "\n" +
-                    "        /*\n" +
-                    "         * 1: set code content\n" +
-                    "         */\n" +
-                    "\n" +
-                    "        // auto language recognition\n" +
-                    "        codeView.setCode(getString(R.string.listing_js));\n" +
-                    "\n" +
-                    "        // specify language for code listing\n" +
-                    "        codeView.setCode(getString(R.string.listing_py), \"py\");\n" +
-                    "    }\n" +
-                    "}");
+            String[] testCode = {"package io.github.kbiakov.codeviewexample;",
+                    "",
+                    "import android.os.Bundle;",
+                    "import android.support.annotation.Nullable;",
+                    "import android.support.v7.app.AppCompatActivity;",
+                    "import android.util.Log;",
+                    "",
+                    "import org.jetbrains.annotations.NotNull;"};
+            codeText = new ArrayList(Arrays.asList(testCode));
+            onNewCodeReceived();
         }
 
         codeView.getOptions().addCodeLineClickListener(new OnCodeLineClickListener() {
@@ -126,21 +97,20 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
     public void onImageProcessingResponse(JSONObject response) {
         try {
-            if (!response.getString("status").equals("Succeeded"))
+            if (!response.getString("status").equals("Succeeded")) {
+                fireNoResultToast();
                 return;
+            }
 
             JSONArray results = response.getJSONObject("recognitionResult").getJSONArray("lines");
-            final String[] resultStrings = new String[results.length()];
             codeText.clear();
 
             for (int i = 0; i < results.length(); i++) {
                 JSONObject tempResult = results.getJSONObject(i);
-                resultStrings[i] = tempResult.getString("text");
                 codeText.add(tempResult.getString("text"));
             }
 
-            Log.e("FinalizedText", Arrays.toString(resultStrings));
-            //onNewCodeReceived(resultStrings);
+            onNewCodeReceived();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -160,7 +130,9 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         startActivity(intent);
     }
 
-    private void onNewCodeReceived(final String lines) {
+    private void onNewCodeReceived() {
+        final String lines = getCodeStringFromLines();
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -212,5 +184,14 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
 
         return code;
+    }
+
+    private void fireNoResultToast() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, "Failed to get text from image!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
