@@ -50,12 +50,10 @@ public class CodeLineEditFragment extends DialogFragment {
      */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
         int lineNum = getArguments().getInt(LINE_ARG);
         String currentCode = getArguments().getString(CODE_ARG);
 
-        // Get the layout inflater
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.fragment_code_line_edit, null);
 
@@ -63,7 +61,7 @@ public class CodeLineEditFragment extends DialogFragment {
         titleText = v.findViewById(R.id.code_entry_title);
 
         codeEntryField.setText(currentCode);
-        titleText.setText("Line " + lineNum);
+        titleText.setText("Line " + (lineNum + 1));
 
         builder.setView(v)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

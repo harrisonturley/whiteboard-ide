@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
                     "",
                     "import org.jetbrains.annotations.NotNull;"};
             codeText = new ArrayList(Arrays.asList(testCode));
-            onNewCodeReceived();
+            newCodeReceived();
         }
 
         codeView.getOptions().addCodeLineClickListener(new OnCodeLineClickListener() {
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
                 codeText.add(tempResult.getString("text"));
             }
 
-            onNewCodeReceived();
+            newCodeReceived();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
     public void onLineSaved(int line, String newText) {
         codeText.set(line, newText);
-        // Call method to translate array to code
+        newCodeReceived();
     }
 
     public void onClickCamera(View v) {
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         startActivity(intent);
     }
 
-    private void onNewCodeReceived() {
+    private void newCodeReceived() {
         final String lines = getCodeStringFromLines();
 
         runOnUiThread(new Runnable() {
