@@ -175,6 +175,11 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         lineFragment.show(getFragmentManager(), "LineEdit");
     }
 
+    /**
+     * Translates the code text list to a string format
+     *
+     * @return string of code
+     */
     private String getCodeStringFromLines() {
         String code = "";
 
