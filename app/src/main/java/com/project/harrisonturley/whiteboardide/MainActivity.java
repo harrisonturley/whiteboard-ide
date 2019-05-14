@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
@@ -45,14 +47,19 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class MainActivity extends AppCompatActivity implements HttpRequestClient.HttpResponseListener, CodeLineEditFragment.CodeLineEditListener {
 
     private static final String uriBase = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
 
     private HttpRequestClient mHttpRequestClient;
-    private CodeView codeView;
-
     private ArrayList<String> codeText;
+
+    private CodeView codeView;
+    private ProgressBar loadingSpinner;
+    private TextView progressText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +67,22 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         setContentView(R.layout.activity_main);
 
         mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), this);
-        codeView = (CodeView) findViewById(R.id.code_view);
         codeText = new ArrayList<String>();
+
+        codeView = (CodeView) findViewById(R.id.code_view);
+        loadingSpinner = (ProgressBar) findViewById(R.id.loading_progress_spinner);
+        progressText = (TextView) findViewById(R.id.progress_spinner_text);
 
         Bundle extras = getIntent().getExtras();
 
         if (extras != null) {
             sendImage(extras.getString(getString(R.string.saved_image_path)));
+            loadingSpinner.setVisibility(VISIBLE);
+            progressText.setVisibility(VISIBLE);
+            codeView.setVisibility(GONE);
         } else {
+            loadingSpinner.setVisibility(GONE);
+            progressText.setVisibility(GONE);
             String[] testCode = {"package io.github.kbiakov.codeviewexample;",
                     "",
                     "import android.os.Bundle;",
@@ -120,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
      * CodeLineEditFragment listener callbacks
      */
 
-    public void onLineSaved(int line, String newText) {
+    public void onLineChanged(int line, String newText) {
         codeText.set(line, newText);
         newCodeReceived();
     }
@@ -136,6 +151,9 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                loadingSpinner.setVisibility(GONE);
+                progressText.setVisibility(GONE);
+                codeView.setVisibility(VISIBLE);
                 codeView.setCode(lines);
             }
         });

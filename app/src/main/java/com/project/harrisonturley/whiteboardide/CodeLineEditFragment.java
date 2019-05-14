@@ -21,7 +21,7 @@ public class CodeLineEditFragment extends DialogFragment {
      * Callback from saving the code to update code view
      */
     public interface CodeLineEditListener {
-        void onLineSaved(int line, String newText);
+        void onLineChanged(int line, String newText);
     }
 
     private static final String LINE_ARG = "LineNum";
@@ -70,7 +70,7 @@ public class CodeLineEditFragment extends DialogFragment {
                     }
                 }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        listener.onLineSaved(1, codeEntryField.getText().toString());
+                        listener.onLineChanged(1, codeEntryField.getText().toString());
                         CodeLineEditFragment.this.getDialog().cancel();
                     }
         });
