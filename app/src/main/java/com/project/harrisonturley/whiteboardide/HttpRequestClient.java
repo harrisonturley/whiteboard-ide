@@ -114,8 +114,7 @@ public class HttpRequestClient {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    Log.e("Callback", "response");
-                    byte[] gzippedContent = response.
+                    Log.e("Callback", response.body().string());
                 }
             });
         } catch (Exception e) {
