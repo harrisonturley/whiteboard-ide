@@ -52,7 +52,8 @@ import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity implements HttpRequestClient.HttpResponseListener, CodeLineEditFragment.CodeLineEditListener {
 
-    private static final String uriBase = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
+    private static final String IMAGE_URI_BASE = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
+    private static final String CODE_EXECUTE_URI_BASE = "https://api.jdoodle.com/v1/execute";
 
     private HttpRequestClient mHttpRequestClient;
     private ArrayList<String> codeText;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), this);
+        mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), getString(R.string.jdoodle_client_id), getString(R.string.jdoodle_client_secret), this);
         codeText = new ArrayList<String>();
 
         codeView = (CodeView) findViewById(R.id.code_view);
@@ -83,14 +84,15 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         } else {
             loadingSpinner.setVisibility(GONE);
             progressText.setVisibility(GONE);
-            String[] testCode = {"package io.github.kbiakov.codeviewexample;",
+            String[] testCode = {"public class MyClass {",
                     "",
-                    "import android.os.Bundle;",
-                    "import android.support.annotation.Nullable;",
-                    "import android.support.v7.app.AppCompatActivity;",
-                    "import android.util.Log;",
+                    "    public static void main(String args[]) {",
+                    "        int x = 10;",
+                    "        int y = 35;",
                     "",
-                    "import org.jetbrains.annotations.NotNull;"};
+                    "        System.out.println(\"Sum of x+y = \" + (x + y));",
+                    "    }",
+                    "}"};
             codeText = new ArrayList(Arrays.asList(testCode));
             newCodeReceived();
         }
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         File imgFile = new File(imageFilePath);
 
         params.put("mode", "Handwritten");
-        String url = HttpRequestClient.getUrl(uriBase, params);
+        String url = HttpRequestClient.getUrl(IMAGE_URI_BASE, params);
 
         codeView.setOptions(Options.Default.get(this)
             .withTheme(ColorTheme.MONOKAI));
@@ -182,10 +184,14 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
             byte[] data = byteArrayOutputStream.toByteArray();
             params.put("data", data);
 
-            mHttpRequestClient.postWriting(url, params);
+            mHttpRequestClient.postImage(url, params);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void onClickPlayCode(View v) {
+        mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines());
     }
 
     private void openLineEditDialog(int line, String text) {

@@ -2,6 +2,7 @@ package com.project.harrisonturley.whiteboardide;
 
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -10,19 +11,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class HttpRequestClient {
 
@@ -30,27 +29,35 @@ public class HttpRequestClient {
         void onImageProcessingResponse(JSONObject response);
     }
 
-    private static final String HEADER_KEY = "Ocp-Apim-Subscription-Key";
-    private static final String DATA_TYPE_KEY = "Content-Type";
-    private static final String DATA_TYPE_VALUE = "application/octet-stream";
+    private static final String IMAGE_HEADER_KEY = "Ocp-Apim-Subscription-Key";
+    private static final String IMAGE_DATA_TYPE_KEY = "Content-Type";
+    private static final String IMAGE_DATA_TYPE_VALUE = "application/octet-stream";
+    private static final String CODE_EXECUTE_CLIENT_ID = "clientId";
+    private static final String CODE_EXECUTE_CLIENT_SECRET = "clientSecret";
+    private static final String CODE_EXECUTE_TEXT = "script";
+    private static final String CODE_EXECUTE_LANGUAGE = "language";
+    private static final String CODE_EXECUTE_VERSION_INDEX = "versionIndex";
 
     private OkHttpClient mClient = new OkHttpClient();
     private HttpResponseListener httpResponseListener;
     private String imageProcessingKey;
+    private String codeExecuteClientId;
+    private String codeExecuteClientSecret;
 
-    public HttpRequestClient(String imageProcessingKey, HttpResponseListener httpResponseListener) {
+    public HttpRequestClient(String imageProcessingKey, String codeExecuteClientId, String codeExecuteClientSecret, HttpResponseListener httpResponseListener) {
         this.imageProcessingKey = imageProcessingKey;
+        this.codeExecuteClientId = codeExecuteClientId;
+        this.codeExecuteClientSecret = codeExecuteClientSecret;
         this.httpResponseListener = httpResponseListener;
     }
 
-    public Object postWriting(String url, Map<String, Object> data) {
-        String json;
+    public Object postImage(String url, Map<String, Object> data) {
         MediaType mediaType = MediaType.parse("application/octet-stream");
         RequestBody requestBody = RequestBody.create(mediaType,(byte[]) data.get("data"));
 
         Request request = new Request.Builder()
-                .addHeader(HEADER_KEY, imageProcessingKey)
-                .addHeader(DATA_TYPE_KEY, DATA_TYPE_VALUE)
+                .addHeader(IMAGE_HEADER_KEY, imageProcessingKey)
+                .addHeader(IMAGE_DATA_TYPE_KEY, IMAGE_DATA_TYPE_VALUE)
                 .url(url)
                 .post(requestBody)
                 .build();
@@ -64,13 +71,53 @@ public class HttpRequestClient {
                 }
 
                 @Override public void onResponse(Call call, Response response) throws IOException {
-                    if (!response.isSuccessful())
+                    if (!response.isSuccessful()) {
                         throw new IOException("Unexpected code " + response);
+                    }
 
-                    getResult(response);
+                    getImageResult(response);
                 }
             });
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return request;
+    }
+
+    public Object postCode(String url, String code) {
+        MediaType mediaType = MediaType.parse("application/json");
+
+        try {
+            JSONObject json = createCodeTextJSON(code);
+            Log.e("Test", json.toString());
+            RequestBody requestBody = RequestBody.create(mediaType, json.toString());
+            //RequestBody requestBody = new FormBody.Builder()
+                    /*.add(CODE_EXECUTE_CLIENT_ID, codeExecuteClientId)
+                    .add(CODE_EXECUTE_CLIENT_SECRET, codeExecuteClientSecret)
+                    .add(CODE_EXECUTE_TEXT, code)
+                    .add(CODE_EXECUTE_LANGUAGE, "java")
+                    .add(CODE_EXECUTE_VERSION_INDEX, "" + 2)
+                    .build();*/
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+            Call call = mClient.newCall(request);
+
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.e("Callback", "Fail");
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    Log.e("Callback", "response");
+                    byte[] gzippedContent = response.
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -102,7 +149,7 @@ public class HttpRequestClient {
         return url.toString();
     }
 
-    private void getResult(Response response) {
+    private void getImageResult(Response response) {
         Headers headers = response.headers();
         String url = headers.get("Operation-Location");
 
@@ -110,7 +157,7 @@ public class HttpRequestClient {
             Thread.sleep(10000);
 
             Request request = new Request.Builder()
-                    .addHeader(HEADER_KEY, imageProcessingKey)
+                    .addHeader(IMAGE_HEADER_KEY, imageProcessingKey)
                     .url(url)
                     .build();
 
@@ -121,6 +168,17 @@ public class HttpRequestClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private JSONObject createCodeTextJSON(String code) throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put(CODE_EXECUTE_CLIENT_ID, codeExecuteClientId);
+        json.put(CODE_EXECUTE_CLIENT_SECRET, codeExecuteClientSecret);
+        json.put(CODE_EXECUTE_TEXT, code);
+        json.put(CODE_EXECUTE_LANGUAGE, "java");
+        json.put(CODE_EXECUTE_VERSION_INDEX, "" + 2);
+
+        return json;
     }
 
     private String readInput(InputStream is) throws IOException {
