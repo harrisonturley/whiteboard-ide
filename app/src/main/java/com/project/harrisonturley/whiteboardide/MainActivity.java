@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
     private static final String IMAGE_URI_BASE = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
     private static final String CODE_EXECUTE_URI_BASE = "https://api.jdoodle.com/v1/execute";
+    private static final int CODE_SUCCESS_STATUS = 200;
 
     private HttpRequestClient mHttpRequestClient;
     private ArrayList<String> codeText;
@@ -130,6 +131,19 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
             newCodeReceived();
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void onCodeRunResponse(String response, int statusCode) {
+        if (statusCode == CODE_SUCCESS_STATUS) {
+            // Change to new activity here with response in bundle
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(MainActivity.this, "Failed to run code!", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

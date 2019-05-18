@@ -50,7 +50,7 @@ public class CodeLineEditFragment extends DialogFragment {
      */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        int lineNum = getArguments().getInt(LINE_ARG);
+        final int lineNum = getArguments().getInt(LINE_ARG);
         String currentCode = getArguments().getString(CODE_ARG);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -70,7 +70,7 @@ public class CodeLineEditFragment extends DialogFragment {
                     }
                 }).setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        listener.onLineChanged(1, codeEntryField.getText().toString());
+                        listener.onLineChanged(lineNum, codeEntryField.getText().toString());
                         CodeLineEditFragment.this.getDialog().cancel();
                     }
         });

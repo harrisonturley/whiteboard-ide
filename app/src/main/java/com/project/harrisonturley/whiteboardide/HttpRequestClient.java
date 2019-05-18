@@ -27,6 +27,7 @@ public class HttpRequestClient {
 
     interface HttpResponseListener {
         void onImageProcessingResponse(JSONObject response);
+        void onCodeRunResponse(String response, int statusCode);
     }
 
     private static final String IMAGE_HEADER_KEY = "Ocp-Apim-Subscription-Key";
@@ -37,6 +38,8 @@ public class HttpRequestClient {
     private static final String CODE_EXECUTE_TEXT = "script";
     private static final String CODE_EXECUTE_LANGUAGE = "language";
     private static final String CODE_EXECUTE_VERSION_INDEX = "versionIndex";
+    private static final String CODE_RESPONSE_OUTPUT = "output";
+    private static final String CODE_RESPONSE_STATUS = "statusCode";
 
     private OkHttpClient mClient = new OkHttpClient();
     private HttpResponseListener httpResponseListener;
@@ -91,15 +94,7 @@ public class HttpRequestClient {
 
         try {
             JSONObject json = createCodeTextJSON(code);
-            Log.e("Test", json.toString());
             RequestBody requestBody = RequestBody.create(mediaType, json.toString());
-            //RequestBody requestBody = new FormBody.Builder()
-                    /*.add(CODE_EXECUTE_CLIENT_ID, codeExecuteClientId)
-                    .add(CODE_EXECUTE_CLIENT_SECRET, codeExecuteClientSecret)
-                    .add(CODE_EXECUTE_TEXT, code)
-                    .add(CODE_EXECUTE_LANGUAGE, "java")
-                    .add(CODE_EXECUTE_VERSION_INDEX, "" + 2)
-                    .build();*/
             Request request = new Request.Builder()
                     .url(url)
                     .post(requestBody)
@@ -109,12 +104,17 @@ public class HttpRequestClient {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    Log.e("Callback", "Fail");
+                    Log.e("Http Code Run", "Failed to run");
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    Log.e("Callback", response.body().string());
+                    try {
+                        JSONObject responseJson = new JSONObject(response.body().string());
+                        httpResponseListener.onCodeRunResponse(responseJson.getString(CODE_RESPONSE_OUTPUT), responseJson.getInt(CODE_RESPONSE_STATUS));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         } catch (Exception e) {
