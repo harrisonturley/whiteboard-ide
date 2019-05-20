@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     private static final String IMAGE_URI_BASE = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
     private static final String CODE_EXECUTE_URI_BASE = "https://api.jdoodle.com/v1/execute";
     private static final int CODE_SUCCESS_STATUS = 200;
+    private static final String CODE_LINES_TAG = "CodeLines";
+    private static final String CODE_OUTPUT_TAG = "CodeOutput";
 
     private HttpRequestClient mHttpRequestClient;
     private ArrayList<String> codeText;
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         progressText = (TextView) findViewById(R.id.progress_spinner_text);
 
         Bundle extras = getIntent().getExtras();
+        codeView.setOptions(Options.Default.get(this)
+                .withTheme(ColorTheme.MONOKAI));
 
         if (extras != null) {
             sendImage(extras.getString(getString(R.string.saved_image_path)));
@@ -138,6 +142,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         if (statusCode == CODE_SUCCESS_STATUS) {
             // Change to new activity here with response in bundle
             Intent intent = new Intent(this, CodeOutput.class);
+            intent.putExtra(CODE_LINES_TAG, codeText);
+            intent.putExtra(CODE_OUTPUT_TAG, response);
             startActivity(intent);
         } else {
             runOnUiThread(new Runnable() {
@@ -184,9 +190,6 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         params.put("mode", "Handwritten");
         String url = HttpRequestClient.getUrl(IMAGE_URI_BASE, params);
 
-        codeView.setOptions(Options.Default.get(this)
-            .withTheme(ColorTheme.MONOKAI));
-
         try {
             InputStream imgStream = new FileInputStream(imgFile);
 
@@ -207,7 +210,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     }
 
     public void onClickPlayCode(View v) {
-        mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines());
+        //mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines());
+        onCodeRunResponse("test", 200);
     }
 
     private void openLineEditDialog(int line, String text) {
