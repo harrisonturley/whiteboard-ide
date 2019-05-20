@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     public void onCodeRunResponse(String response, int statusCode) {
         if (statusCode == CODE_SUCCESS_STATUS) {
             // Change to new activity here with response in bundle
+            Intent intent = new Intent(this, CodeOutput.class);
+            startActivity(intent);
         } else {
             runOnUiThread(new Runnable() {
                 @Override

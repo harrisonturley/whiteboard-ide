@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SavePictureActivity"></activity>
+        <activity android:name=".CodeOutput"></activity>
+        <activity android:name=".SavePictureActivity" />
         <activity android:name=".PictureActivity" />
         <activity
             android:name=".MainActivity"
