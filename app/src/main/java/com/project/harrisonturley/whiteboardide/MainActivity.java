@@ -76,8 +76,13 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         progressText = (TextView) findViewById(R.id.progress_spinner_text);
 
         Bundle extras = getIntent().getExtras();
-        codeView.setOptions(Options.Default.get(this)
-                .withTheme(ColorTheme.MONOKAI));
+        codeView.setOptions(Options.Default.get(this).withTheme(ColorTheme.MONOKAI));
+        codeView.getOptions().addCodeLineClickListener(new OnCodeLineClickListener() {
+            @Override
+            public void onCodeLineClicked(int i, @NotNull String s) {
+                openLineEditDialog(i, s);
+            }
+        });
 
         if (extras != null) {
             if (extras.getString(getString(R.string.saved_image_path)) != null) {
@@ -107,13 +112,6 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
             codeText = new ArrayList(Arrays.asList(testCode));
             newCodeReceived();
         }
-
-        codeView.getOptions().addCodeLineClickListener(new OnCodeLineClickListener() {
-            @Override
-            public void onCodeLineClicked(int i, @NotNull String s) {
-                openLineEditDialog(i, s);
-            }
-        });
     }
 
     @Override

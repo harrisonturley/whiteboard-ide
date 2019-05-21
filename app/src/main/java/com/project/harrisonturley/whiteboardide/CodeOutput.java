@@ -35,6 +35,11 @@ public class CodeOutput extends AppCompatActivity {
         setupOutputText();
     }
 
+    @Override
+    public void onBackPressed() {
+        onClickBack(null);
+    }
+
     public void onClickBack(View v) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(getString(R.string.code_lines_tag), codeText);
