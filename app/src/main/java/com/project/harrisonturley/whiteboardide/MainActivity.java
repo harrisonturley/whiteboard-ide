@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     private static final String IMAGE_URI_BASE = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
     private static final String CODE_EXECUTE_URI_BASE = "https://api.jdoodle.com/v1/execute";
     private static final int CODE_SUCCESS_STATUS = 200;
-    private static final String CODE_LINES_TAG = "CodeLines";
-    private static final String CODE_OUTPUT_TAG = "CodeOutput";
 
     private HttpRequestClient mHttpRequestClient;
     private ArrayList<String> codeText;
@@ -82,10 +80,18 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
                 .withTheme(ColorTheme.MONOKAI));
 
         if (extras != null) {
-            sendImage(extras.getString(getString(R.string.saved_image_path)));
-            loadingSpinner.setVisibility(VISIBLE);
-            progressText.setVisibility(VISIBLE);
-            codeView.setVisibility(GONE);
+            if (extras.getString(getString(R.string.saved_image_path)) != null) {
+                loadingSpinner.setVisibility(VISIBLE);
+                progressText.setVisibility(VISIBLE);
+                codeView.setVisibility(GONE);
+                sendImage(extras.getString(getString(R.string.saved_image_path)));
+            } else {
+                loadingSpinner.setVisibility(GONE);
+                progressText.setVisibility(GONE);
+                codeView.setVisibility(VISIBLE);
+                codeText = (ArrayList<String>)getIntent().getSerializableExtra(getString(R.string.code_lines_tag));
+                newCodeReceived();
+            }
         } else {
             loadingSpinner.setVisibility(GONE);
             progressText.setVisibility(GONE);
@@ -142,8 +148,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         if (statusCode == CODE_SUCCESS_STATUS) {
             // Change to new activity here with response in bundle
             Intent intent = new Intent(this, CodeOutput.class);
-            intent.putExtra(CODE_LINES_TAG, codeText);
-            intent.putExtra(CODE_OUTPUT_TAG, response);
+            intent.putExtra(getString(R.string.code_lines_tag), codeText);
+            intent.putExtra(getString(R.string.code_output_tag), response);
             startActivity(intent);
         } else {
             runOnUiThread(new Runnable() {
