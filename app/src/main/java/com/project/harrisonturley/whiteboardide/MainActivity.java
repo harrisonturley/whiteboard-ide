@@ -210,8 +210,9 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     }
 
     public void onClickPlayCode(View v) {
-        //mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines());
-        onCodeRunResponse("test", 200);
+        loadingSpinner.setVisibility(VISIBLE);
+        progressText.setVisibility(VISIBLE);
+        mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines());
     }
 
     private void openLineEditDialog(int line, String text) {
