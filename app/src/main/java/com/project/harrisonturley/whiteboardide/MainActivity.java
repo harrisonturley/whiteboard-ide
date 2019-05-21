@@ -173,6 +173,16 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         newCodeReceived();
     }
 
+    public void onAddLine(int line) {
+        codeText.add(line + 1, "");
+        newCodeReceived();
+    }
+
+    public void onDeleteLine(int line) {
+        codeText.remove(line);
+        newCodeReceived();
+    }
+
     public void onClickCamera(View v) {
         Intent intent = new Intent(this, PictureActivity.class);
         startActivity(intent);

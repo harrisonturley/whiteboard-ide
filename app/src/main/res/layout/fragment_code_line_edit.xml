@@ -42,6 +42,64 @@
 
     <!-- Below header -->
 
+    <TextView
+        android:id="@+id/new_line_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add New Line Below:"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/code_entry_border"/>
+
+    <ImageView
+        android:id="@+id/new_line_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_baseline_add_circle_outline_24px"
+        android:onClick="onClickAddLine"
+        android:layout_marginRight="10dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/new_line_text"
+        app:layout_constraintBottom_toBottomOf="@id/new_line_text"/>
+
+    <TextView
+        android:id="@+id/delete_line_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete Line:"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/new_line_text"/>
+
+    <ImageView
+        android:id="@+id/delete_line_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/baseline_delete"
+        android:onClick="onClickDeleteLine"
+        android:layout_marginRight="10dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/delete_line_text"
+        app:layout_constraintTop_toTopOf="@id/delete_line_text"/>
+
+    <TextView
+        android:id="@+id/edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit:"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/delete_line_text"/>
+
     <EditText
         android:id="@+id/code_entry_field"
         android:layout_width="0dp"
@@ -51,11 +109,11 @@
         android:text="Code"
         android:paddingLeft="6dp"
         android:paddingRight="6dp"
-        android:paddingTop="15dp"
+        android:paddingTop="5dp"
         android:color="#FFFFFF"
         android:backgroundTint="#FFFFFF"
         android:textColor="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/code_entry_border"
+        app:layout_constraintTop_toBottomOf="@id/edit_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 

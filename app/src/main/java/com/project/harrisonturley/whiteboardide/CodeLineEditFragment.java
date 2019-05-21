@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -22,6 +23,8 @@ public class CodeLineEditFragment extends DialogFragment {
      */
     public interface CodeLineEditListener {
         void onLineChanged(int line, String newText);
+        void onAddLine(int line);
+        void onDeleteLine(int line);
     }
 
     private static final String LINE_ARG = "LineNum";
@@ -29,6 +32,8 @@ public class CodeLineEditFragment extends DialogFragment {
 
     private EditText codeEntryField;
     private TextView titleText;
+    private ImageView addLineButton;
+    private ImageView deleteLineButton;
 
     private CodeLineEditListener listener;
 
@@ -59,9 +64,27 @@ public class CodeLineEditFragment extends DialogFragment {
 
         codeEntryField = v.findViewById(R.id.code_entry_field);
         titleText = v.findViewById(R.id.code_entry_title);
+        addLineButton = v.findViewById(R.id.new_line_icon);
+        deleteLineButton = v.findViewById(R.id.delete_line_icon);
 
         codeEntryField.setText(currentCode);
         titleText.setText("Line " + (lineNum + 1));
+
+        addLineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onAddLine(lineNum);
+                CodeLineEditFragment.this.getDialog().cancel();
+            }
+        });
+
+        deleteLineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onDeleteLine(lineNum);
+                CodeLineEditFragment.this.getDialog().cancel();
+            }
+        });
 
         builder.setView(v)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
