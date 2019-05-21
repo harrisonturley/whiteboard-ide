@@ -131,6 +131,11 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
             JSONArray results = response.getJSONObject("recognitionResult").getJSONArray("lines");
             codeText.clear();
 
+            if (results == null) {
+                fireNoResultToast();
+                return;
+            }
+
             for (int i = 0; i < results.length(); i++) {
                 JSONObject tempResult = results.getJSONObject(i);
                 codeText.add(tempResult.getString("text"));
@@ -244,6 +249,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                loadingSpinner.setVisibility(GONE);
+                progressText.setVisibility(GONE);
                 Toast.makeText(MainActivity.this, "Failed to get text from image!", Toast.LENGTH_SHORT).show();
             }
         });
