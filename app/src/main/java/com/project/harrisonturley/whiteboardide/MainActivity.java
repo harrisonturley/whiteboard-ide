@@ -19,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.googlejavaformat.java.Formatter;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -245,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
      * @return string of code
      */
     private String getCodeStringFromLines() {
+        String formattedCode;
         String code = "";
 
         for (int i = 0; i < codeText.size(); i++) {
@@ -252,7 +255,13 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
             code += "\n";
         }
 
-        return code;
+        try {
+            formattedCode = new Formatter().formatSource(code);
+            return formattedCode;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return code;
+        }
     }
 
     private void fireNoResultToast() {
