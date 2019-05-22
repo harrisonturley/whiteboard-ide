@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         } else {
             loadingSpinner.setVisibility(GONE);
             progressText.setVisibility(GONE);
-            String[] testCode = {"public class MyClass {",
+            String[] defaultCode = {"public class MyClass {",
                     "",
                     "    public static void main(String args[]) {",
                     "        int x = 10;",
@@ -110,26 +110,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
                     "",
                     "        System.out.println(\"Sum of x+y = \" + (x + y));",
                     "    }",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",
-                    "}",};
-            codeText = new ArrayList(Arrays.asList(testCode));
+                    "}"};
+            codeText = new ArrayList(Arrays.asList(defaultCode));
             newCodeReceived();
         }
     }
