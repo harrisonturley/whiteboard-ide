@@ -110,7 +110,25 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
                     "",
                     "        System.out.println(\"Sum of x+y = \" + (x + y));",
                     "    }",
-                    "}"};
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",
+                    "}",};
             codeText = new ArrayList(Arrays.asList(testCode));
             newCodeReceived();
         }
