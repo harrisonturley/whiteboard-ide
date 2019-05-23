@@ -7,6 +7,8 @@
     android:background="#28292a"
     tools:context="com.project.harrisonturley.whiteboardide.CodeOutput">
 
+    <!-- Header -->
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/app_header"
         android:layout_width="match_parent"
@@ -46,6 +48,8 @@
 
     </android.support.constraint.ConstraintLayout>
 
+    <!-- Code view -->
+
     <HorizontalScrollView
         android:id="@+id/code_view_horizontal_scroll"
         android:layout_width="match_parent"
@@ -61,6 +65,8 @@
 
     </HorizontalScrollView>
 
+    <!-- Output section -->
+    
     <TextView
         android:id="@+id/output_explanation_text"
         android:layout_width="wrap_content"

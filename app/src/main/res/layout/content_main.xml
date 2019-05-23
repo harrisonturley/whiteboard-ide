@@ -9,6 +9,8 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <!-- Header -->
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/app_header"
         android:layout_width="match_parent"
@@ -59,6 +61,8 @@
 
     </android.support.constraint.ConstraintLayout>
 
+    <!-- Code view -->
+
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -72,6 +76,8 @@
             android:layout_height="wrap_content"/>
 
     </HorizontalScrollView>
+
+    <!-- Loading progress section -->
 
     <ProgressBar
         android:id="@+id/loading_progress_spinner"
@@ -94,6 +100,8 @@
         app:layout_constraintTop_toBottomOf="@id/loading_progress_spinner"
         app:layout_constraintLeft_toLeftOf="@id/loading_progress_spinner"
         app:layout_constraintRight_toRightOf="@id/loading_progress_spinner"/>
+
+    <!-- Camera section -->
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
