@@ -183,22 +183,11 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
      */
 
     public void onLineChanged(int line, String newText) {
-        /*while (line >= codeText.size() - 1) {
-            codeText.add(line, "");
-        }*/
-
         codeText.set(line, newText);
         newCodeReceived();
     }
 
     public void onAddLine(int line) {
-        /*if (line >= codeText.size()) {
-            while (line >= codeText.size() - 1) {
-                codeText.add(line, "");
-            }
-        } else {
-            codeText.add(line + 1, "");
-        }*/
         if (line >= codeText.size()) {
             codeText.add(line, "");
         } else {
