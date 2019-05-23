@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Bundle extras = getIntent().getExtras();
 
         mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), getString(R.string.jdoodle_client_id), getString(R.string.jdoodle_client_secret), this);
         codeText = new ArrayList<String>();
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         progressText = findViewById(R.id.progress_spinner_text);
         languageSpinner = findViewById(R.id.language_spinner);
 
-        Bundle extras = getIntent().getExtras();
         codeView.setOptions(Options.Default.get(this).withTheme(ColorTheme.MONOKAI));
         codeView.getOptions().addCodeLineClickListener(new OnCodeLineClickListener() {
             @Override
@@ -159,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
     public void onCodeRunResponse(String response, int statusCode) {
         if (statusCode == CODE_SUCCESS_STATUS) {
-            // Change to new activity here with response in bundle
             Intent intent = new Intent(this, CodeOutput.class);
             intent.putExtra(getString(R.string.code_lines_tag), codeText);
             intent.putExtra(getString(R.string.code_output_tag), response);
@@ -168,7 +167,10 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(MainActivity.this, "Failed to run code!", Toast.LENGTH_SHORT).show();
+                    loadingSpinner.setVisibility(GONE);
+                    progressText.setVisibility(GONE);
+                    languageSpinner.setClickable(true);
+                    Toast.makeText(MainActivity.this, "Failed to run code! Check language setting.", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -184,7 +186,12 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     }
 
     public void onAddLine(int line) {
-        codeText.add(line + 1, "");
+        if (line == codeText.size()) {
+            codeText.add(line, "");
+        } else {
+            codeText.add(line + 1, "");
+        }
+
         newCodeReceived();
     }
 
@@ -241,7 +248,8 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     public void onClickPlayCode(View v) {
         loadingSpinner.setVisibility(VISIBLE);
         progressText.setVisibility(VISIBLE);
-        mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines());
+        languageSpinner.setClickable(false);
+        mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines(), languageSpinner.getSelectedItem().toString());
     }
 
     private void openLineEditDialog(int line, String text) {
@@ -260,7 +268,10 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
         for (int i = 0; i < codeText.size(); i++) {
             code += codeText.get(i);
-            code += "\n";
+
+            if (i != codeText.size() - 1) {
+                code += "\n";
+            }
         }
 
         try {

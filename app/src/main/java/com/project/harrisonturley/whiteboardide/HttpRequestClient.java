@@ -1,5 +1,6 @@
 package com.project.harrisonturley.whiteboardide;
 
+import android.content.res.Resources;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -46,12 +48,22 @@ public class HttpRequestClient {
     private String imageProcessingKey;
     private String codeExecuteClientId;
     private String codeExecuteClientSecret;
+    private Map<String, String> languageToJsonLanguage;
+    private Map<String, String> languageToVersion;
 
     public HttpRequestClient(String imageProcessingKey, String codeExecuteClientId, String codeExecuteClientSecret, HttpResponseListener httpResponseListener) {
         this.imageProcessingKey = imageProcessingKey;
         this.codeExecuteClientId = codeExecuteClientId;
         this.codeExecuteClientSecret = codeExecuteClientSecret;
         this.httpResponseListener = httpResponseListener;
+
+        languageToJsonLanguage = new HashMap<>();
+        languageToJsonLanguage.put("Java", "java");
+        languageToJsonLanguage.put("C++", "cpp");
+
+        languageToVersion = new HashMap<>();
+        languageToVersion.put("Java", "2");
+        languageToVersion.put("C++", "3");
     }
 
     public Object postImage(String url, Map<String, Object> data) {
@@ -89,11 +101,11 @@ public class HttpRequestClient {
         return request;
     }
 
-    public Object postCode(String url, String code) {
+    public Object postCode(String url, String code, String language) {
         MediaType mediaType = MediaType.parse("application/json");
 
         try {
-            JSONObject json = createCodeTextJSON(code);
+            JSONObject json = createCodeTextJSON(code, language);
             RequestBody requestBody = RequestBody.create(mediaType, json.toString());
             Request request = new Request.Builder()
                     .url(url)
@@ -169,14 +181,14 @@ public class HttpRequestClient {
         }
     }
 
-    private JSONObject createCodeTextJSON(String code) throws JSONException {
+    private JSONObject createCodeTextJSON(String code, String language) throws JSONException {
         JSONObject json = new JSONObject();
+
         json.put(CODE_EXECUTE_CLIENT_ID, codeExecuteClientId);
         json.put(CODE_EXECUTE_CLIENT_SECRET, codeExecuteClientSecret);
         json.put(CODE_EXECUTE_TEXT, code);
-        json.put(CODE_EXECUTE_LANGUAGE, "java");
-        json.put(CODE_EXECUTE_VERSION_INDEX, "" + 2);
-
+        json.put(CODE_EXECUTE_LANGUAGE, languageToJsonLanguage.get(language));
+        json.put(CODE_EXECUTE_VERSION_INDEX, languageToVersion.get(language));
         return json;
     }
 
