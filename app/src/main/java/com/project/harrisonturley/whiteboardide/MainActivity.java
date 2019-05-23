@@ -15,7 +15,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     private CodeView codeView;
     private ProgressBar loadingSpinner;
     private TextView progressText;
+    private Spinner languageSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +76,10 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         mHttpRequestClient = new HttpRequestClient(getString(R.string.image_processing_api_key), getString(R.string.jdoodle_client_id), getString(R.string.jdoodle_client_secret), this);
         codeText = new ArrayList<String>();
 
-        codeView = (CodeView) findViewById(R.id.code_view);
-        loadingSpinner = (ProgressBar) findViewById(R.id.loading_progress_spinner);
-        progressText = (TextView) findViewById(R.id.progress_spinner_text);
+        codeView = findViewById(R.id.code_view);
+        loadingSpinner = findViewById(R.id.loading_progress_spinner);
+        progressText = findViewById(R.id.progress_spinner_text);
+        languageSpinner = findViewById(R.id.language_spinner);
 
         Bundle extras = getIntent().getExtras();
         codeView.setOptions(Options.Default.get(this).withTheme(ColorTheme.MONOKAI));
@@ -85,6 +89,10 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
                 openLineEditDialog(i, s);
             }
         });
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.language_array, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        languageSpinner.setAdapter(adapter);
 
         if (extras != null) {
             if (extras.getString(getString(R.string.saved_image_path)) != null) {

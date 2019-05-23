@@ -11,4 +11,9 @@
 
     <string name="code_lines_tag">CodeLines</string>
     <string name="code_output_tag">CodeOutput</string>
+
+    <string-array name="language_array">
+        <item>Java</item>
+        <item>C++</item>
+    </string-array>
 </resources>
