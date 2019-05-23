@@ -11,11 +11,19 @@ import android.widget.ImageView;
 
 import java.io.File;
 
+/**
+ * Screen for deciding to save or delete image
+ */
 public class SavePictureActivity extends AppCompatActivity {
 
     private ImageView savedImage;
     private String savedImagePath = null;
 
+    /**
+     * Initializes the SavePictureActivity, and it's fields
+     *
+     * @param savedInstanceState activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,17 +38,30 @@ public class SavePictureActivity extends AppCompatActivity {
         setupSavedImage();
     }
 
+    /**
+     * Sends the image to the Main Activity to be send to Azure
+     *
+     * @param v button that was clicked
+     */
     public void onClickSend(View v) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(getString(R.string.saved_image_path), savedImagePath);
         startActivity(intent);
     }
 
+    /**
+     * Disregards image and returns to the PictureActivity to take another picture
+     *
+     * @param v button that was clicked
+     */
     public void onClickCancel(View v) {
         Intent intent = new Intent(this, PictureActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Decodes the saved image to set it as the background for viewing
+     */
     private void setupSavedImage() {
         if (savedImagePath == null) {
             Log.e("Image Path", "Error getting image path");

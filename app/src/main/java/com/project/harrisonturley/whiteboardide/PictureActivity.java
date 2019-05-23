@@ -34,6 +34,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 
+/**
+ * Screen for taking picture of code
+ */
 public class PictureActivity extends AppCompatActivity {
 
     private static final int CAMERA_REQUEST_CODE = 200;
@@ -59,6 +62,11 @@ public class PictureActivity extends AppCompatActivity {
     private String cameraId;
     private String imagePath;
 
+    /**
+     * Sets up the required fields for the picture activity, and any listeners
+     *
+     * @param savedInstanceState activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +135,9 @@ public class PictureActivity extends AppCompatActivity {
         };
     }
 
+    /**
+     * Sets up the camera and thread again when app resumes
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -139,6 +150,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Stops the camera and background thread when the app is stopped
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -146,6 +160,11 @@ public class PictureActivity extends AppCompatActivity {
         closeBackgroundThread();
     }
 
+    /**
+     * Captures the current image, saves it, and moves to the SavePictureActivity
+     *
+     * @param v view for button selected
+     */
     public void onClickCaptureImage(View v) {
         lock();
         FileOutputStream outputPhoto = null;
@@ -170,6 +189,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Closes the camera session
+     */
     private void closeCamera() {
         if (cameraCaptureSession != null) {
             cameraCaptureSession.close();
@@ -182,6 +204,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Closes the background thread
+     */
     private void closeBackgroundThread() {
         if (backgroundHandler != null) {
             backgroundThread.quitSafely();
@@ -190,6 +215,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initializes a preview session of the camera
+     */
     private void createPreviewSession() {
         try {
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
@@ -226,6 +254,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets up the physical camera characteristics
+     */
     private void setUpCamera() {
         try {
             for (String cameraId : cameraManager.getCameraIdList()) {
@@ -242,6 +273,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Opens the camera for use in preview and capture
+     */
     private void openCamera() {
         try {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -252,12 +286,18 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Opens a background thread for the camera
+     */
     private void openBackgroundThread() {
         backgroundThread = new HandlerThread("camera_background_thread");
         backgroundThread.start();
         backgroundHandler = new Handler(backgroundThread.getLooper());
     }
 
+    /**
+     * Takes an image
+     */
     private void lock() {
         try {
             cameraCaptureSession.capture(captureRequestBuilder.build(),
@@ -267,6 +307,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Resumes the preview session
+     */
     private void unlock() {
         try {
             cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(),
@@ -276,6 +319,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Enables the capture button
+     */
     private void enableFab() {
         if (floatingActionButton == null) {
             return;
@@ -285,6 +331,9 @@ public class PictureActivity extends AppCompatActivity {
         floatingActionButton.setAlpha(1.0f);
     }
 
+    /**
+     * Disables the capture button
+     */
     private void disableFab() {
         if (floatingActionButton == null) {
             return;
@@ -294,6 +343,12 @@ public class PictureActivity extends AppCompatActivity {
         floatingActionButton.setEnabled(false);
     }
 
+    /**
+     * Saves the captured image as a file on the system
+     *
+     * @return file for the captured image
+     * @throws IOException in case file creation/modification fails
+     */
     private File createImageFile() throws IOException {
         File galleryFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), getResources().getString(R.string.app_name));
         if (!galleryFolder.exists()) {

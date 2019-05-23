@@ -25,8 +25,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * Client for sending HTTP requests to Azure Computer Vision and Jdoodle
+ */
 public class HttpRequestClient {
 
+    /**
+     * Definition of callback listener for sending results from this HTTP client to the main activity
+     */
     interface HttpResponseListener {
         void onImageProcessingResponse(JSONObject response);
         void onCodeRunResponse(String response, int statusCode);
@@ -51,6 +57,14 @@ public class HttpRequestClient {
     private Map<String, String> languageToJsonLanguage;
     private Map<String, String> languageToVersion;
 
+    /**
+     * Sets up the HTTP client with the required fields
+     *
+     * @param imageProcessingKey key required for Azure's Computer Vision API
+     * @param codeExecuteClientId ID needed for Jdoodle's API
+     * @param codeExecuteClientSecret secret key needed for Jdoodle's API
+     * @param httpResponseListener listener to send callbacks on
+     */
     public HttpRequestClient(String imageProcessingKey, String codeExecuteClientId, String codeExecuteClientSecret, HttpResponseListener httpResponseListener) {
         this.imageProcessingKey = imageProcessingKey;
         this.codeExecuteClientId = codeExecuteClientId;
@@ -66,6 +80,13 @@ public class HttpRequestClient {
         languageToVersion.put("C++", "3");
     }
 
+    /**
+     * Posts an image to Azure's Computer Vision API
+     *
+     * @param url url to send the image to
+     * @param data data of the image to send
+     * @return request object from the call
+     */
     public Object postImage(String url, Map<String, Object> data) {
         MediaType mediaType = MediaType.parse("application/octet-stream");
         RequestBody requestBody = RequestBody.create(mediaType,(byte[]) data.get("data"));
@@ -101,7 +122,14 @@ public class HttpRequestClient {
         return request;
     }
 
-    public Object postCode(String url, String code, String language) {
+    /**
+     * Posts the provided code to Jdoodle's API to be run
+     *
+     * @param url url to send the code to
+     * @param code provided, formatted code
+     * @param language language that the code will be sent as
+     */
+    public void postCode(String url, String code, String language) {
         MediaType mediaType = MediaType.parse("application/json");
 
         try {
@@ -132,10 +160,15 @@ public class HttpRequestClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return null;
     }
 
+    /**
+     * Creates the URL based on the parameters provided
+     *
+     * @param path base url
+     * @param params parameters to add to the url
+     * @return parameterized url
+     */
     public static String getUrl(String path, Map<String, Object> params) {
         StringBuffer url = new StringBuffer(path);
 
@@ -160,6 +193,11 @@ public class HttpRequestClient {
         return url.toString();
     }
 
+    /**
+     * Retrieves the result from Azure's Computer Vision API
+     *
+     * @param response initial response from Azure indicating that it received the image
+     */
     private void getImageResult(Response response) {
         Headers headers = response.headers();
         String url = headers.get("Operation-Location");
@@ -181,6 +219,14 @@ public class HttpRequestClient {
         }
     }
 
+    /**
+     * Creates the JSON to send the code to Jdoodle
+     *
+     * @param code provided code
+     * @param language language that the code is written in
+     * @return a JSONObject containing the required parameters for Jdoodle's API
+     * @throws JSONException in case of failed JSON creation
+     */
     private JSONObject createCodeTextJSON(String code, String language) throws JSONException {
         JSONObject json = new JSONObject();
 
@@ -190,16 +236,5 @@ public class HttpRequestClient {
         json.put(CODE_EXECUTE_LANGUAGE, languageToJsonLanguage.get(language));
         json.put(CODE_EXECUTE_VERSION_INDEX, languageToVersion.get(language));
         return json;
-    }
-
-    private String readInput(InputStream is) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        StringBuffer json = new StringBuffer();
-        String line;
-        while ((line = br.readLine()) != null) {
-            json.append(line);
-        }
-
-        return json.toString();
     }
 }

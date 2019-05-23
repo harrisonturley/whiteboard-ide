@@ -37,6 +37,13 @@ public class CodeLineEditFragment extends DialogFragment {
 
     private CodeLineEditListener listener;
 
+    /**
+     * Factory method for creating a new instance of the CodeLineEditFragment
+     *
+     * @param line line number of the selected line
+     * @param currentText text of the selected line
+     * @return newly created CodeLineEditFragment based on params
+     */
     public static CodeLineEditFragment newInstance(int line, String currentText) {
         CodeLineEditFragment newLineDialog = new CodeLineEditFragment();
 
@@ -50,6 +57,7 @@ public class CodeLineEditFragment extends DialogFragment {
 
     /**
      * Creates the dialog fragment based on the layout
+     *
      * @param savedInstanceState saved state variables
      * @return the built dialog
      */

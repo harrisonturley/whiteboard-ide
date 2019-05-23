@@ -55,6 +55,9 @@ import okhttp3.Response;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+/**
+ * Screen to edit/run code, launch camera, and select language
+ */
 public class MainActivity extends AppCompatActivity implements HttpRequestClient.HttpResponseListener, CodeLineEditFragment.CodeLineEditListener {
 
     private static final String IMAGE_URI_BASE = "https://westus.api.cognitive.microsoft.com/vision/v2.0/recognizeText";
@@ -69,6 +72,11 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
     private TextView progressText;
     private Spinner languageSpinner;
 
+    /**
+     * Sets up the main screen, based on the Android lifecycle.  Initializes all fields for the class.
+     *
+     * @param savedInstanceState activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,13 +134,20 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
     }
 
+    /**
+     * Overrides back button functionality such that user can't accidentally break navigation
+     */
     @Override
     public void onBackPressed() { }
 
-    /*
-     * HttpRequestClient callbacks
-     */
 
+    // HttpRequestClient callbacks //
+
+    /**
+     * Callback from HttpRequestClient, with the response from processing the image of code
+     *
+     * @param response json object response from Azure's Computer Vision API
+     */
     public void onImageProcessingResponse(JSONObject response) {
         try {
             if (!response.getString("status").equals("Succeeded")) {
@@ -159,6 +174,12 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
     }
 
+    /**
+     * Callback from HttpRequestClient, with response from running the code
+     *
+     * @param response string of response from Jdoodle's API
+     * @param statusCode response code that Jdoodle sent, 200 == success
+     */
     public void onCodeRunResponse(String response, int statusCode) {
         if (statusCode == CODE_SUCCESS_STATUS) {
             Intent intent = new Intent(this, CodeOutput.class);
@@ -178,15 +199,25 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
     }
 
-    /*
-     * CodeLineEditFragment listener callbacks
-     */
 
+    // CodeLineEditFragment listener callbacks //
+
+    /**
+     * Callback from CodeLineEditFragment, notifying main activity to update code when a line is changed
+     *
+     * @param line number of line changed
+     * @param newText text for the provided line
+     */
     public void onLineChanged(int line, String newText) {
         codeText.set(line, newText);
         newCodeReceived();
     }
 
+    /**
+     * Callback from CodeLineEditFragment, notifying main activity to add a line below the selected line number
+     *
+     * @param line number of line to add another line below
+     */
     public void onAddLine(int line) {
         if (line >= codeText.size()) {
             codeText.add(line, "");
@@ -197,16 +228,32 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         newCodeReceived();
     }
 
+    /**
+     * Callback from the CodeLineEditFragment, notifying main activity to delete the provided line
+     *
+     * @param line number of line to delete
+     */
     public void onDeleteLine(int line) {
         codeText.remove(line);
         newCodeReceived();
     }
 
+
+    // Helpers //
+
+    /**
+     * Starts camera activity when user selects button
+     *
+     * @param v view selected
+     */
     public void onClickCamera(View v) {
         Intent intent = new Intent(this, PictureActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Updates the code view.  To be called whenever new lines of code are received or modified
+     */
     private void newCodeReceived() {
         final String lines = getCodeStringFromLines();
 
@@ -221,6 +268,11 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         });
     }
 
+    /**
+     * Sends the image at the provided path to the Azure Computer Vision API to be processed for text/code
+     *
+     * @param imageFilePath path to image
+     */
     private void sendImage(String imageFilePath) {
         Map<String, Object> params = new HashMap<>();
         File imgFile = new File(imageFilePath);
@@ -247,6 +299,11 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
     }
 
+    /**
+     * Runs the code in main activity with Jdoodle's API.
+     *
+     * @param v view of button selected
+     */
     public void onClickPlayCode(View v) {
         loadingSpinner.setVisibility(VISIBLE);
         progressText.setVisibility(VISIBLE);
@@ -254,6 +311,12 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         mHttpRequestClient.postCode(CODE_EXECUTE_URI_BASE, getCodeStringFromLines(), languageSpinner.getSelectedItem().toString());
     }
 
+    /**
+     * Opens the edit fragment for the given line of code
+     *
+     * @param line number of line that was selected for editing
+     * @param text current text at selected line
+     */
     private void openLineEditDialog(int line, String text) {
         CodeLineEditFragment lineFragment = CodeLineEditFragment.newInstance(line, text);
         lineFragment.show(getFragmentManager(), "LineEdit");
@@ -286,12 +349,20 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         }
     }
 
+    /**
+     * Sets the code text ArrayList based a newly formatted string
+     *
+     * @param code new code to be parsed and set as the code text list
+     */
     private void updateCodeTextFromString(String code) {
         String[] codeLines = code.split("\n");
         codeText = new ArrayList<>(Arrays.asList(codeLines));
         codeText.add(codeText.size(), "");
     }
 
+    /**
+     * Fires a "no results" toast on the UI thread
+     */
     private void fireNoResultToast() {
         runOnUiThread(new Runnable() {
             @Override

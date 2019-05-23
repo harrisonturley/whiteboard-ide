@@ -14,6 +14,9 @@ import io.github.kbiakov.codeview.CodeView;
 import io.github.kbiakov.codeview.adapters.Options;
 import io.github.kbiakov.codeview.highlight.ColorTheme;
 
+/**
+ * Screen for displaying code and it's output after being run
+ */
 public class CodeOutput extends AppCompatActivity {
 
     private ArrayList<String> codeText;
@@ -22,6 +25,11 @@ public class CodeOutput extends AppCompatActivity {
     private TextView outputTextView;
     private CodeView codeView;
 
+    /**
+     * Sets up the output screen, initializes fields for the activity
+     *
+     * @param savedInstanceState activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,23 +45,37 @@ public class CodeOutput extends AppCompatActivity {
         setupOutputText();
     }
 
+    /**
+     * Overrides hardware back button to call software back button
+     */
     @Override
     public void onBackPressed() {
         onClickBack(null);
     }
 
+    /**
+     * Returns to the main activity with the code as a parameter
+     *
+     * @param v button that was selected
+     */
     public void onClickBack(View v) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(getString(R.string.code_lines_tag), codeText);
         startActivity(intent);
     }
 
+    /**
+     * Sets up the code view to display the provided code
+     */
     private void setupCodeView() {
         String lines = getCodeStringFromLines();
         codeView.setOptions(Options.Default.get(this).withTheme(ColorTheme.MONOKAI));
         codeView.setCode(lines);
     }
 
+    /**
+     * Sets up the output text window to display the results of the code being run
+     */
     private void setupOutputText() {
         outputTextView.setText(codeOutput);
     }
