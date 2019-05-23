@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.googlejavaformat.java.Formatter;
+
 import java.util.ArrayList;
 
 import io.github.kbiakov.codeview.CodeView;
@@ -63,12 +65,19 @@ public class CodeOutput extends AppCompatActivity {
      */
     private String getCodeStringFromLines() {
         String code = "";
+        String formattedCode;
 
         for (int i = 0; i < codeText.size(); i++) {
             code += codeText.get(i);
             code += "\n";
         }
 
-        return code;
+        try {
+            formattedCode = new Formatter().formatSource(code);
+            return formattedCode;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return code;
+        }
     }
 }

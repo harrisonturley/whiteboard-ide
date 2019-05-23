@@ -27,6 +27,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,8 +45,10 @@ public class PictureActivity extends AppCompatActivity {
     private Handler backgroundHandler;
     private TextureView.SurfaceTextureListener surfaceTextureListener;
     private CameraDevice.StateCallback stateCallback;
+
     private TextureView textureView;
     private FloatingActionButton floatingActionButton;
+    private ImageView backButton;
 
     private CaptureRequest.Builder captureRequestBuilder;
     private CaptureRequest captureRequest;
@@ -61,14 +64,24 @@ public class PictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
 
-        floatingActionButton = (FloatingActionButton)findViewById(R.id.capture_button);
-        disableFab();
-
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET}, CAMERA_REQUEST_CODE);
 
+        floatingActionButton = findViewById(R.id.capture_button);
         cameraManager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         cameraFacing = CameraCharacteristics.LENS_FACING_BACK;
-        textureView = (TextureView)findViewById(R.id.texture_view);
+        textureView = findViewById(R.id.texture_view);
+        backButton = findViewById(R.id.camera_back_button);
+
+        disableFab();
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PictureActivity.this, MainActivity.class);
+                closeCamera();
+                closeBackgroundThread();
+                startActivity(intent);
+            }
+        });
 
         surfaceTextureListener = new TextureView.SurfaceTextureListener() {
             @Override

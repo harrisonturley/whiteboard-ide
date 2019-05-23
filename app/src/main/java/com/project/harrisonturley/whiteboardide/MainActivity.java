@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openjdk.tools.javac.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -113,10 +114,11 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
             String[] defaultCode = {"public class MyClass {",
                     "",
                     "    public static void main(String args[]) {",
-                    "        int x = 10;",
+                    "        int x = 40;",
                     "        int y = 35;",
+                    "        int z = 3;",
                     "",
-                    "        System.out.println(\"Sum of x+y = \" + (x + y));",
+                    "        System.out.println(\"Sum of (x+y)/z = \" + (x + y)/z);",
                     "    }",
                     "}"};
             codeText = new ArrayList(Arrays.asList(defaultCode));
@@ -181,12 +183,23 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
      */
 
     public void onLineChanged(int line, String newText) {
+        /*while (line >= codeText.size() - 1) {
+            codeText.add(line, "");
+        }*/
+
         codeText.set(line, newText);
         newCodeReceived();
     }
 
     public void onAddLine(int line) {
-        if (line == codeText.size()) {
+        /*if (line >= codeText.size()) {
+            while (line >= codeText.size() - 1) {
+                codeText.add(line, "");
+            }
+        } else {
+            codeText.add(line + 1, "");
+        }*/
+        if (line >= codeText.size()) {
             codeText.add(line, "");
         } else {
             codeText.add(line + 1, "");
@@ -276,11 +289,18 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
 
         try {
             formattedCode = new Formatter().formatSource(code);
+            updateCodeTextFromString(formattedCode);
             return formattedCode;
         } catch (Exception e) {
             e.printStackTrace();
             return code;
         }
+    }
+
+    private void updateCodeTextFromString(String code) {
+        String[] codeLines = code.split("\n");
+        codeText = new ArrayList<>(Arrays.asList(codeLines));
+        codeText.add(codeText.size(), "");
     }
 
     private void fireNoResultToast() {
