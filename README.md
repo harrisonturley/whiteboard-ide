@@ -14,3 +14,14 @@ At the moment, the app supports Java and C++ code.  I want to expand this furthe
 As well, I would like to try to port this app idea to iOS eventually.  
 ## Screenshots
 <img src="images/HomeScreen.jpg" width="250"> <img src="images/OutputScreen.jpg" width="250"> <img src="images/PictureScreen.jpg" width="250"> 
+## Licensing
+This project is open source, so please feel free to fork it and add your own features.  
+One requirement to run this app is the creation of a "secrets" xml file.  This will house your Azure Computer Vision API key, and Jdoodle API ID/secret.  You must make the file: app\src\main\res\values\secrets.xml, with the following format:  
+~~~
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_processing_api_key">AZURE_API_KEY_HERE</string>
+    <string name="jdoodle_client_id">JDOODLE_API_ID_HERE</string>
+    <string name="jdoodle_client_secret">JDOODLE_API_SECRET_HERE</string>
+</resources>
+~~~
