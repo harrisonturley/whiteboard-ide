@@ -13,7 +13,7 @@ Interviewing candidates for Software Engineer positions has largely stayed the s
 At the moment, the app supports Java and C++ code.  I want to expand this further to include other languages in the future.  
 As well, I would like to try to port this app idea to iOS eventually.  
 ## Screenshots
-<img src="images/HomeScreen.jpg" width="250"> <img src="images/OutputScreen.jpg" width="250"> <img src="images/PictureScreen.jpg" width="250"> 
+<img src="images/PictureScreenUpdate.jpg" width="250"> <img src="images/HomeScreenUpdate.jpg" width="250"> <img src="images/OutputScreenUpdate.jpg" width="250">  
 ## Licensing
 This project is open source, so please feel free to fork it and add your own features.  
 One requirement to run this app is the creation of a "secrets" xml file.  This will house your Azure Computer Vision API key, and Jdoodle API ID/secret.  You must make the file: app\src\main\res\values\secrets.xml, with the following format:  
