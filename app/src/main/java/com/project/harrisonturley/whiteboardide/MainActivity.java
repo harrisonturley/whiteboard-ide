@@ -103,19 +103,17 @@ public class MainActivity extends AppCompatActivity implements HttpRequestClient
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         languageSpinner.setAdapter(adapter);
 
-        if (extras != null) {
-            if (extras.getString(getString(R.string.saved_image_path)) != null) {
-                loadingSpinner.setVisibility(VISIBLE);
-                progressText.setVisibility(VISIBLE);
-                codeView.setVisibility(GONE);
-                sendImage(extras.getString(getString(R.string.saved_image_path)));
-            } else {
-                loadingSpinner.setVisibility(GONE);
-                progressText.setVisibility(GONE);
-                codeView.setVisibility(VISIBLE);
-                codeText = (ArrayList<String>)getIntent().getSerializableExtra(getString(R.string.code_lines_tag));
-                newCodeReceived();
-            }
+        if (extras != null && extras.getString(getString(R.string.saved_image_path)) != null) {
+            loadingSpinner.setVisibility(VISIBLE);
+            progressText.setVisibility(VISIBLE);
+            codeView.setVisibility(GONE);
+            sendImage(extras.getString(getString(R.string.saved_image_path)));
+        } else if (extras != null && getIntent().getSerializableExtra(getString(R.string.code_lines_tag)) != null) {
+            loadingSpinner.setVisibility(GONE);
+            progressText.setVisibility(GONE);
+            codeView.setVisibility(VISIBLE);
+            codeText = (ArrayList<String>)getIntent().getSerializableExtra(getString(R.string.code_lines_tag));
+            newCodeReceived();
         } else {
             loadingSpinner.setVisibility(GONE);
             progressText.setVisibility(GONE);
